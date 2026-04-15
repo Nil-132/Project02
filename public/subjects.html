@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subjects - My PW Replica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%); }
+    .subject-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .subject-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <nav class="bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-800">My PW Replica</h1>
+      <button onclick="logout()" class="text-red-500 hover:text-red-600 flex items-center gap-2">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-8 py-12">
+    <h2 class="text-3xl font-bold text-gray-800 mb-10 text-center">Choose Your Subject</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="subjects-container"></div>
+  </div>
+
+  <script>
+    const subjectsList = [
+      { id: "quant",    name: "Quantitative Aptitude",   color: "blue" },
+      { id: "reasoning",name: "Reasoning Ability",       color: "purple" },
+      { id: "english",  name: "English Language",        color: "pink" },
+      { id: "banking",  name: "Banking Awareness",       color: "yellow" },
+      { id: "current",  name: "Current Affairs",         color: "green" }
+    ];
+
+    async function renderSubjects() {
+      const container = document.getElementById('subjects-container');
+      let html = '';
+
+      for (let sub of subjectsList) {
+        try {
+          // Fetch total lectures for this subject
+          const res = await fetch(`/api/lectures?subjectId=${sub.id}`);
+          const lectures = await res.json();
+          
+          const totalLectures = lectures.length;
+          const completedLectures = lectures.filter(l => l.completed === true).length;
+          const progress = totalLectures > 0 ? Math.round((completedLectures / totalLectures) * 100) : 0;
+
+          html += `
+            <div onclick="openSubject('${sub.id}', '${sub.name}')" 
+                 class="subject-card bg-white rounded-3xl p-8 border border-gray-100 cursor-pointer">
+              <div class="flex justify-between items-start">
+                <div class="w-16 h-16 flex items-center justify-center text-5xl font-bold rounded-3xl bg-${sub.color}-100 text-${sub.color}-600">
+                  ${sub.name.substring(0,1)}
+                </div>
+                <div class="text-right">
+                  <div class="text-sm text-gray-500">${totalLectures} Lectures</div>
+                  <div class="text-4xl font-bold text-${sub.color}-600 mt-1">${progress}%</div>
+                </div>
+              </div>
+              <h3 class="text-2xl font-semibold mt-10">${sub.name}</h3>
+              <p class="text-gray-600 mt-3 text-sm">Click to start learning</p>
+              
+              <div class="mt-8 h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-${sub.color}-500 rounded-full" style="width: ${progress}%"></div>
+              </div>
+            </div>`;
+        } catch (err) {
+          console.error("Error loading subject:", sub.id, err);
+          // Fallback card
+          html += `
+            <div onclick="openSubject('${sub.id}', '${sub.name}')" 
+                 class="subject-card bg-white rounded-3xl p-8 border border-gray-100 cursor-pointer">
+              <h3 class="text-2xl font-semibold">${sub.name}</h3>
+              <p class="text-gray-500 mt-2">Loading lectures...</p>
+            </div>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function openSubject(subjectId, subjectName) {
+      window.location.href = `/${subjectId}/index.html?subjectId=${subjectId}&subjectName=${encodeURIComponent(subjectName)}`;
+    }
+
+    function logout() {
+      if (confirm("Logout from My PW Replica?")) {
+        window.location.href = "/";
+      }
+    }
+
+    // Initialize
+    window.onload = renderSubjects;
+  </script>
+</body>
+</html>

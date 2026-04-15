@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My PW - Study Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%); 
+    }
+    .card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+    }
+    .live-dot {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="fixed inset-0 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10">
+      <div class="text-center mb-10">
+        <div class="w-20 h-20 bg-blue-600 rounded-3xl mx-auto flex items-center justify-center text-white text-4xl font-bold mb-6">P</div>
+        <h1 class="text-3xl font-bold text-gray-800">My PW</h1>
+        <p class="text-gray-500 mt-2">Welcome back!</p>
+      </div>
+      
+      <input id="password-input" type="password" placeholder="Enter your password" 
+             class="w-full px-6 py-5 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500 mb-6">
+      
+      <button onclick="handleLogin()" 
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl text-lg font-semibold transition">
+        Login
+      </button>
+      
+      <p id="login-error" class="text-red-500 text-center mt-6 hidden">Incorrect password. Try again.</p>
+      <p class="text-center text-xs text-gray-400 mt-8">Default password: <span class="font-mono bg-gray-100 px-2 py-1 rounded">admin123</span></p>
+    </div>
+  </div>
+
+  <!-- Main Study Portal -->
+  <div id="main-portal" class="hidden min-h-screen">
+
+    <!-- Top Nav -->
+    <nav class="bg-white border-b shadow-sm">
+      <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">P</div>
+          <h1 class="text-2xl font-bold text-gray-800">My PW</h1>
+        </div>
+        <button onclick="logout()" class="flex items-center gap-2 text-gray-600 hover:text-red-600">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-8 py-16">
+      <div class="text-center mb-16">
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">Welcome to Your Study Portal</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Select your learning path. Join a live session now or revise previous lectures from the library.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+
+        <!-- Live Card -->
+        <div class="card bg-white rounded-3xl p-10 border border-gray-100">
+          <div class="flex justify-center mb-8">
+            <div class="w-24 h-24 bg-red-100 rounded-3xl flex items-center justify-center relative">
+              <div class="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center live-dot">
+                <i class="fa-solid fa-circle text-white text-3xl"></i>
+              </div>
+            </div>
+          </div>
+          <h2 class="text-3xl font-semibold text-center mb-3">Live Ticking Schedule</h2>
+          <p class="text-gray-600 text-center leading-relaxed mb-10">
+            View the upcoming class schedule, countdowns, and join premieres the exact second they go live.
+          </p>
+          <div class="flex justify-center">
+            <button onclick="viewLiveSchedule()" 
+                    class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-12 py-4 rounded-2xl font-semibold text-lg flex items-center gap-3 hover:scale-105 transition">
+              <i class="fa-solid fa-play"></i>
+              View Schedule
+            </button>
+          </div>
+        </div>
+
+        <!-- Recorded Lectures Card -->
+        <div class="card bg-white rounded-3xl p-10 border border-gray-100">
+          <div class="flex justify-center mb-8">
+            <div class="w-24 h-24 bg-blue-100 rounded-3xl flex items-center justify-center">
+              <i class="fa-solid fa-book-open text-blue-600 text-5xl"></i>
+            </div>
+          </div>
+          <h2 class="text-3xl font-semibold text-center mb-3">Recorded Lectures</h2>
+          <p class="text-gray-600 text-center leading-relaxed mb-10">
+            Revise and complete your backlog. Access all completed sessions, organized by topic and date.
+          </p>
+          <div class="flex justify-center">
+            <button onclick="openLibrary()" 
+                    class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-12 py-4 rounded-2xl font-semibold text-lg flex items-center gap-3 hover:scale-105 transition">
+              <i class="fa-solid fa-folder-open"></i>
+              Open Library
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Planner Button -->
+      <div class="flex justify-center mt-12">
+        <button onclick="openPlanner()" 
+                class="flex items-center gap-3 bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-10 py-5 rounded-3xl font-semibold text-lg shadow-sm transition">
+          <i class="fa-solid fa-calendar-days text-2xl"></i>
+          Open Planner
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleLogin() {
+      const password = document.getElementById('password-input').value;
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem('token', 'logged-in');
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('main-portal').classList.remove('hidden');
+        } else {
+          document.getElementById('login-error').classList.remove('hidden');
+        }
+      });
+    }
+
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem('token');
+        location.reload();
+      }
+    }
+
+    function viewLiveSchedule() {
+      window.location.href = "/live.html";
+    }
+
+    function openLibrary() {
+      window.location.href = "/subjects.html";   // We'll create this next
+    }
+
+    function openPlanner() {
+      alert("📅 Study Planner is coming soon!");
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem('token')) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-portal').classList.remove('hidden');
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Classes - My PW</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%); 
+    }
+    .tab-active { 
+      background-color: #1e40af; 
+      color: white; 
+      box-shadow: 0 4px 12px -2px rgb(30 64 175 / 0.3);
+    }
+    .lecture-card { 
+      transition: all 0.4s ease; 
+    }
+    .lecture-card:hover { 
+      transform: translateY(-6px); 
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); 
+    }
+    .live-dot { 
+      animation: pulse 2s infinite; 
+    }
+    @keyframes pulse { 
+      0%, 100% { opacity: 1; } 
+      50% { opacity: 0.4; } 
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <div class="max-w-5xl mx-auto px-6 py-10">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-12">
+      <div>
+        <h1 class="text-4xl font-bold text-gray-900">Live Classes</h1>
+        <p class="text-gray-600 mt-2">Join live sessions or watch recordings</p>
+      </div>
+      
+      <!-- Elegant Time Display -->
+      <div class="flex items-center gap-3 bg-white px-6 py-3 rounded-3xl shadow-sm border border-gray-100">
+        <i class="fa-solid fa-clock text-blue-600"></i>
+        <div id="live-time" class="text-2xl font-semibold text-gray-800 tracking-wider"></div>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="flex flex-wrap justify-center gap-3 mb-12" id="category-tabs">
+      <button onclick="filterClasses('all')" class="tab-active px-7 py-3 rounded-3xl text-sm font-medium">All</button>
+      <button onclick="filterClasses('quant')" class="px-7 py-3 rounded-3xl text-sm font-medium hover:bg-white">Quant</button>
+      <button onclick="filterClasses('english')" class="px-7 py-3 rounded-3xl text-sm font-medium hover:bg-white">English</button>
+      <button onclick="filterClasses('reasoning')" class="px-7 py-3 rounded-3xl text-sm font-medium hover:bg-white">Reasoning</button>
+      <button onclick="filterClasses('banking')" class="px-7 py-3 rounded-3xl text-sm font-medium hover:bg-white">Banking</button>
+      <button onclick="filterClasses('current')" class="px-7 py-3 rounded-3xl text-sm font-medium hover:bg-white">Current Affairs</button>
+      
+      <button onclick="showAddModal()" 
+              class="ml-auto w-11 h-11 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-3xl text-3xl font-light shadow transition">
+        +
+      </button>
+    </div>
+
+    <!-- Lectures Container -->
+    <div id="lectures-container" class="space-y-6"></div>
+
+  </div>
+
+  <!-- Add New Schedule Modal -->
+  <div id="add-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-lg mx-4">
+      <h2 class="text-2xl font-semibold mb-6">Add New Schedule</h2>
+      
+      <div class="space-y-6">
+        <input id="new-title" type="text" placeholder="Lecture Title" 
+               class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500">
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Date</label>
+            <input id="new-date" type="date" class="w-full border border-gray-300 rounded-2xl px-5 py-4">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Duration (min)</label>
+            <input id="new-duration" type="number" value="45" 
+                   class="w-full border border-gray-300 rounded-2xl px-5 py-4">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">Time</label>
+          <div class="flex gap-3">
+            <select id="new-hour" class="flex-1 border border-gray-300 rounded-2xl px-5 py-4"></select>
+            <select id="new-minute" class="flex-1 border border-gray-300 rounded-2xl px-5 py-4"></select>
+            <select id="new-ampm" class="w-24 border border-gray-300 rounded-2xl px-5 py-4">
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">YouTube Video ID</label>
+          <input id="new-youtube-id" type="text" placeholder="e.g. dQw4w9wgxcq" 
+                 class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">Category</label>
+          <select id="new-category" class="w-full border border-gray-300 rounded-2xl px-5 py-4">
+            <option value="quant">Quant</option>
+            <option value="english">English</option>
+            <option value="reasoning">Reasoning</option>
+            <option value="banking">Banking</option>
+            <option value="current">Current Affairs</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-4 mt-8">
+        <button onclick="hideAddModal()" class="flex-1 py-4 border border-gray-300 rounded-2xl font-medium">Cancel</button>
+        <button onclick="addNewSchedule()" class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold">Add Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let lectures = [];
+
+    // Load schedules from MongoDB
+    async function loadSchedules() {
+      try {
+        const res = await fetch('/api/live-schedules');
+        lectures = await res.json();
+        renderLectures(lectures);
+      } catch (err) {
+        console.error("Failed to load schedules", err);
+      }
+    }
+
+    // Real-time Clock
+    function startRealTimeClock() {
+      const timeEl = document.getElementById('live-time');
+      function update() {
+        const now = new Date();
+        let h = now.getHours();
+        const m = now.getMinutes().toString().padStart(2, '0');
+        const s = now.getSeconds().toString().padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        timeEl.textContent = `${h}:${m}:${s} ${ampm}`;
+      }
+      update();
+      setInterval(update, 1000);
+    }
+
+    function renderLectures(data) {
+      const container = document.getElementById('lectures-container');
+      let html = '';
+
+      data.forEach(lec => {
+        let statusHTML = '';
+        let buttonHTML = '';
+
+        if (lec.status === "live") {
+          statusHTML = `<span class="inline-flex items-center gap-2 bg-red-100 text-red-700 text-xs font-semibold px-4 py-1.5 rounded-2xl">
+                          <span class="w-3 h-3 bg-red-500 rounded-full live-dot"></span> LIVE NOW
+                        </span>`;
+          buttonHTML = lec.youtubeId ? 
+            `<button onclick="playVideo('${lec.youtubeId}')" class="bg-red-600 text-white px-8 py-3 rounded-2xl text-sm font-medium">Watch Live</button>` :
+            `<button class="bg-red-600 text-white px-8 py-3 rounded-2xl text-sm font-medium">Join Live</button>`;
+        } 
+        else if (lec.status === "wasLive") {
+          statusHTML = `<span class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 text-xs font-semibold px-4 py-1.5 rounded-2xl">
+                          Was Live ${lec.wasLiveAgo || 0} min ago
+                        </span>`;
+          buttonHTML = `<button onclick="playVideo('${lec.youtubeId}')" class="bg-blue-600 text-white px-8 py-3 rounded-2xl text-sm font-medium">Watch Recording</button>`;
+        } 
+        else if (lec.status === "completed") {
+          statusHTML = `<span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-4 py-1.5 rounded-2xl">COMPLETED</span>`;
+          buttonHTML = `<button onclick="playVideo('${lec.youtubeId}')" class="bg-blue-600 text-white px-8 py-3 rounded-2xl text-sm font-medium">Watch Recording</button>`;
+        } 
+        else {
+          statusHTML = `<span class="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-4 py-1.5 rounded-2xl">UPCOMING</span>`;
+          buttonHTML = `<button onclick="joinLive(${lec.id})" class="bg-red-600 text-white px-8 py-3 rounded-2xl text-sm font-medium">Join Live</button>`;
+        }
+
+        html += `
+          <div class="lecture-card bg-white rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between border border-gray-100">
+            <div class="flex-1">
+              ${statusHTML}
+              <h3 class="text-2xl font-semibold text-gray-800 mt-4">${lec.title}</h3>
+              <p class="text-gray-500">${lec.date} • ${lec.time} • ${lec.duration} min</p>
+            </div>
+            <div class="flex items-center gap-4 mt-6 md:mt-0">
+              ${buttonHTML}
+              <button onclick="deleteSchedule('${lec._id}'); event.stopImmediatePropagation()" 
+                      class="text-red-400 hover:text-red-600 p-3">
+                <i class="fa-solid fa-trash text-2xl"></i>
+              </button>
+            </div>
+          </div>`;
+      });
+
+      container.innerHTML = html || `<p class="text-center text-gray-500 py-20">No classes scheduled for today.</p>`;
+    }
+
+    async function addNewSchedule() {
+      const title = document.getElementById('new-title').value.trim();
+      const dateStr = document.getElementById('new-date').value;
+      const hour = parseInt(document.getElementById('new-hour').value);
+      const minute = parseInt(document.getElementById('new-minute').value);
+      const ampm = document.getElementById('new-ampm').value;
+      const duration = parseInt(document.getElementById('new-duration').value) || 45;
+      const youtubeId = document.getElementById('new-youtube-id').value.trim();
+      const category = document.getElementById('new-category').value;
+
+      if (!title || !dateStr) {
+        alert("Title and Date are required");
+        return;
+      }
+
+      const selectedDate = new Date(dateStr);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      if (selectedDate < today) {
+        alert("You cannot add schedules for past dates.");
+        return;
+      }
+
+      let hour24 = (ampm === "PM" && hour !== 12) ? hour + 12 : (ampm === "AM" && hour === 12 ? 0 : hour);
+      const startTime = new Date(dateStr);
+      startTime.setHours(hour24, minute, 0, 0);
+
+      const timeStr = `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+
+      const newSchedule = {
+        title,
+        date: selectedDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        time: timeStr,
+        duration,
+        category,
+        youtubeId,
+        startTime: startTime.toISOString(),
+        status: "upcoming"
+      };
+
+      try {
+        const res = await fetch('/api/live-schedules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newSchedule)
+        });
+
+        if (res.ok) {
+          hideAddModal();
+          loadSchedules();
+          alert("✅ Schedule added successfully!");
+        }
+      } catch (err) {
+        alert("Failed to save schedule");
+      }
+    }
+
+    async function deleteSchedule(id) {
+      if (!confirm("Delete this schedule permanently?")) return;
+      try {
+        await fetch(`/api/live-schedules/${id}`, { method: 'DELETE' });
+        loadSchedules();
+      } catch (err) {
+        alert("Failed to delete");
+      }
+    }
+
+    function showAddModal() {
+      document.getElementById('add-modal').classList.remove('hidden');
+      populateTimeOptions();
+    }
+
+    function hideAddModal() {
+      document.getElementById('add-modal').classList.add('hidden');
+    }
+
+    function populateTimeOptions() {
+      const hourSelect = document.getElementById('new-hour');
+      const minuteSelect = document.getElementById('new-minute');
+      hourSelect.innerHTML = '';
+      for (let i = 1; i <= 12; i++) {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = i.toString().padStart(2,'0');
+        hourSelect.appendChild(opt);
+      }
+      minuteSelect.innerHTML = '';
+      for (let i = 0; i < 60; i += 5) {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = i.toString().padStart(2,'0');
+        minuteSelect.appendChild(opt);
+      }
+    }
+
+    function playVideo(videoId) {
+      if (!videoId) return alert("No video ID added for this lecture.");
+      window.open(`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`, '_blank');
+    }
+
+    function joinLive(id) {
+      alert(`🎥 Joining Live Class #${id}...`);
+    }
+
+    function filterClasses(category) {
+      document.querySelectorAll('#category-tabs button').forEach(btn => {
+        if (btn.textContent !== '+') {
+          btn.classList.toggle('tab-active', 
+            (category === 'all' && btn.textContent === 'All') || 
+            btn.textContent.toLowerCase() === category);
+        }
+      });
+
+      let filtered = lectures;
+      if (category !== 'all') filtered = lectures.filter(l => l.category === category);
+      renderLectures(filtered);
+    }
+
+    // Initialize
+    window.onload = () => {
+      startRealTimeClock();
+      loadSchedules();
+    };
+  </script>
+</body>
+</html>
