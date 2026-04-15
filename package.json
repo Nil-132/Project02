@@ -1,6 +1,7 @@
 {
-  "name": "mypw-app",
+  "name": "project02",
   "version": "1.0.0",
+  "description": "My PW - Online Study Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,5 +16,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
